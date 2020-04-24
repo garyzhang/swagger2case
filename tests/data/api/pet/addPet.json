@@ -1,0 +1,20 @@
+{
+  "name": "addPet",
+  "variables": [],
+  "base_url": "xxxxxxxxxxx",
+  "request": {
+    "url": "xxxxx",
+    "method": "POST",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "json": {
+      "key": "$var2"
+    }
+  },
+  "validate": [
+    {"eq":  ["status_code", 200]},
+    {"eq":  ["content.success", true]}
+
+  ]
+}
