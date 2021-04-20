@@ -1,0 +1,243 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Test",
+    "version": "last"
+  },
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "公共分类",
+      "description": "公共分类"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/test/form": {
+      "post": {
+        "tags": [
+          "公共分类"
+        ],
+        "summary": "测试表单",
+        "description": "",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization (Only:sdfsfsdfsd fds fds fd )",
+            "required": true,
+            "type": "string",
+            "default": "sdfsfsdfsd fds fds fd "
+          },
+          {
+            "name": "sdfs ",
+            "in": "query",
+            "required": true,
+            "description": "",
+            "type": "string"
+          },
+          {
+            "name": "key",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "required": true,
+            "description": "",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/test/login": {
+      "post": {
+        "tags": [
+          "公共分类"
+        ],
+        "summary": "登录接口",
+        "description": "",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization (Only:sdfsfsfsdfsd dsf )",
+            "required": true,
+            "type": "string",
+            "default": "sdfsfsfsdfsd dsf "
+          },
+          {
+            "name": "root",
+            "in": "body",
+            "schema": {
+              "$schema": "http://json-schema.org/draft-04/schema#",
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "mobile": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "number"
+                },
+                "verificationCode": {
+                  "type": "string"
+                },
+                "obj": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                }
+              },
+              "required": [
+                "obj"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$schema": "http://json-schema.org/draft-04/schema#",
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string"
+                },
+                "code": {
+                  "type": "number"
+                }
+              },
+              "required": []
+            }
+          }
+        }
+      }
+    },
+    "/test/menu": {
+      "get": {
+        "tags": [
+          "公共分类"
+        ],
+        "summary": "获取菜单",
+        "description": "",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Authorization (Only:ss3ssddfsfsdfds)",
+            "required": true,
+            "type": "string",
+            "default": "ss3ssddfsfsdfds"
+          },
+          {
+            "name": "Content-MD5",
+            "in": "header",
+            "description": "Content-MD5 (Only:ssdfsfdsfsd)",
+            "required": true,
+            "type": "string",
+            "default": "ssdfsfdsfsd"
+          },
+          {
+            "name": "menuId",
+            "in": "query",
+            "required": true,
+            "description": "",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "object",
+              "title": "empty object",
+              "properties": {
+                "key": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "obj": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "vales": {
+                      "type": "string"
+                    },
+                    "objd": {
+                      "type": "object",
+                      "properties": {
+                        "sdf": {
+                          "type": "string"
+                        },
+                        "sdf ": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "sdf",
+                        "sdf "
+                      ]
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "vales",
+                    "objd"
+                  ]
+                }
+              },
+              "required": [
+                "key",
+                "name",
+                "obj"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

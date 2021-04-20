@@ -1,67 +1,66 @@
-""" Convert swagger api file to YAML/JSON testcase for HttpRunner.
-Usage:
-    # convert to JSON format testcase
-    >>> swagger2case demo.json
-    # convert to YAML format testcase
-    >>> hswagger2case demo.json -2y
-"""
 import argparse
 import logging
+import os
 import sys
-from swagger2case.__about__ import __version__
-from loguru import logger
+
+from swagger2case import __version__
 from swagger2case.core import SwaggerParser
 
-def main():
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '-V', '--version', dest='version', action='store_true',
-        help="show version"
-    )
-    parser.add_argument(
-        '--log-level', default='INFO',
-        help="Specify logging level, default is INFO."
-    )
-    parser.add_argument('swagger_api_file', nargs='?',
-        help="Specify swagger api file"
-    )
-    parser.add_argument(
-        '-2y', '--to-yml', '--to-yaml',
-        dest='to_yaml', action='store_true',
-        help="Convert to YAML format, if not specified, convert to JSON format by default."
-    )
-    # parser.add_argument(
-    #     '-fmt', '--format',
-    #     dest='fmt_version', default='v1',
-    #     help="Specify YAML/JSON testcase format version, v2 corresponds to HttpRunner 2.2.0+."
-    # )
-    parser.add_argument(
-        '--filter', help="Specify filter keyword, only url include filter string will be converted."
-    )
-    parser.add_argument(
-        '--exclude',
-        help="Specify exclude keyword, url that includes exclude string will be ignored, \
-        multiple keywords can be joined with '|'"
-    )
+def main():
+    parser = argparse.ArgumentParser(
+        description="Convert swagger testcases to yaml testcases for HttpRunner.")
+    parser.add_argument("-V", "--version", dest='version', action='store_true',
+        help="show version")
+    parser.add_argument('--log-level', default='INFO',
+        help="Specify logging level, default is INFO.")
+
+    parser.add_argument('swagger_testset_file', nargs='?',
+        help="Specify swagger testset file.")
+
+    parser.add_argument('--output_file_type', nargs='?',
+        help="Optional. Specify output file type.")
+
+    parser.add_argument('--output_dir', nargs='?',
+        help="Optional. Specify output directory.")
 
     args = parser.parse_args()
 
-    if len(sys.argv) == 1:
-        parser.print_help()
-        exit(0)
-
     if args.version:
-        print(f"{__version__}")
+        print("{}".format(__version__))
         exit(0)
 
-    swagger_api_file = args.swagger_api_file
-    if not swagger_api_file or not swagger_api_file.endswith(".json"):
-        logger.error("swagger api file not specified")
-        exit(1)
+    log_level = getattr(logging, args.log_level.upper())
+    logging.basicConfig(level=log_level)
 
-    output_file_type = "YML" if args.to_yaml else "JSON"
-    SwaggerParser(
-        swagger_api_file, args.filter, args.exclude
-    ).gen_testcase(output_file_type)
+    swagger_testset_file = args.swagger_testset_file
+    output_file_type = args.output_file_type
+    output_dir = args.output_dir
+
+    if not swagger_testset_file or not swagger_testset_file.endswith(".json"):
+        logging.error("swagger_testset_file file not specified.")
+        sys.exit(1)
+    
+    if not output_file_type:
+        output_file_type = "yaml"
+    else:
+        output_file_type = output_file_type.lower()
+    if output_file_type not in ["json", "yml", "yaml"]:
+        logging.error("output file only support json/yml/yaml.")
+        sys.exit(1)
+    
+    if not output_dir:
+        output_dir = '.'
+
+    swagger_parser = SwaggerParser(swagger_testset_file)
+    parse_result, name = swagger_parser.parse_data()
+    swagger_parser.save(parse_result, output_dir, output_file_type=output_file_type, name=name)
+
+    return 0
+
+
+
+
+
+
 

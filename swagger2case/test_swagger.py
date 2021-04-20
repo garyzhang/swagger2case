@@ -1,3 +1,0 @@
-class TestSwagger(object):
-
-    pass
