@@ -49,7 +49,7 @@ class SwaggerParser(object):
 
     def parse_object(self, object_data, api):
         data = {}
-        for k, d in object_data.items():
+        for k, d in object_data and object_data.items() or {}:
             if d.get('type') == 'object': 
                 temp = self.parse_object(d.get('properties'), api)
                 data[k] = temp

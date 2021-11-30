@@ -1,3 +1,4 @@
+LICENSE
 README.md
 setup.py
 swagger2case/__init__.py
