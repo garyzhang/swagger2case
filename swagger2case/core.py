@@ -78,8 +78,9 @@ class SwaggerParser(object):
         request["url"] = url
 
         if request["method"].upper() == "GET":
-            request["headers"] = self.parse_request_data('header', item["parameters"], api)
-            request["params"] = self.parse_request_data('query', item["parameters"], api)
+            if "parameters" in item.keys():
+                request["headers"] = self.parse_request_data('header', item["parameters"], api)
+                request["params"] = self.parse_request_data('query', item["parameters"], api)
         else:
             for v in re.findall(r'\{\{.+?\}\}', url):
                 api['config']["variables"][v[2:-2]] = ''
@@ -107,7 +108,7 @@ class SwaggerParser(object):
     def parse_items(self, items, folder_name=None, base_path='/'):
         result = []
         for item_key, item_value in items.items():
-            if "parameters" not in item_value.keys():
+            if "responses" not in item_value.keys():
                 temp = self.parse_items(item_value, folder_name, self.parse_url(base_path, item_key))
                 result += temp
             else:
