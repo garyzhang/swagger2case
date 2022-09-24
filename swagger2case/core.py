@@ -29,12 +29,12 @@ class SwaggerParser(object):
                 url= request_url["raw"]
         return '{}{}'.format('' if base_path == '/' else base_path, url)
     
-    def parse_request_data(self, type, request_data, api):
+    def parse_request_data(self, type, request_data,  definitions, api):
         data = {}
         for d in request_data:
             if d.get('in') != type: continue
             if d.get('schema'):
-                data = self.parse_object(d.get('schema').get('properties'), api)
+                data = self.parse_object(definitions.get(d.get('schema').get('originalRef')).get('properties'), api)
             else:
                 key = d["name"]
                 value = d.get('default') or d["type"]
@@ -65,7 +65,7 @@ class SwaggerParser(object):
                 data[key] = value
         return data
 
-    def parse_each_item(self, item, url='/'):
+    def parse_each_item(self, item, definitions, url='/'):
         """ parse each item in swagger to testcase in httprunner
         """
         api = dict(config=dict(base_url='$base_url'), teststeps=[])
@@ -79,16 +79,16 @@ class SwaggerParser(object):
 
         if request["method"].upper() == "GET":
             if "parameters" in item.keys():
-                request["headers"] = self.parse_request_data('header', item["parameters"], api)
-                request["params"] = self.parse_request_data('query', item["parameters"], api)
+                request["headers"] = self.parse_request_data('header', item["parameters"], definitions, api)
+                request["params"] = self.parse_request_data('query', item["parameters"], definitions, api)
         else:
             for v in re.findall(r'\{\{.+?\}\}', url):
                 api['config']["variables"][v[2:-2]] = ''
                 url = url.replace(v, '${}'.format(v[2:-2]))
-            request["headers"] = self.parse_request_data('header', item["parameters"], api)
+            request["headers"] = self.parse_request_data('header', item["parameters"], definitions, api)
 
-            body = self.parse_request_data('body', item["parameters"], api) 
-            form_data = self.parse_request_data('formData', item["parameters"], api)
+            body = self.parse_request_data('body', item["parameters"], definitions, api)
+            form_data = self.parse_request_data('formData', item["parameters"], definitions, api)
 
             body = dict(body, **form_data)
 
@@ -105,18 +105,18 @@ class SwaggerParser(object):
         api["teststeps"].append(dict(name=url, request=request, validate=[dict(eq=['status_code', 200])]))
         return api
     
-    def parse_items(self, items, folder_name=None, base_path='/'):
+    def parse_items(self, items, definitions, folder_name=None, base_path='/', ):
         result = []
         for item_key, item_value in items.items():
-            if "responses" not in item_value.keys():
-                temp = self.parse_items(item_value, folder_name, self.parse_url(base_path, item_key))
+            if "operationId" not in item_value.keys():
+                temp = self.parse_items(item_value, definitions, folder_name, self.parse_url(base_path, item_key),)
                 result += temp
             else:
                 folder = item_value.get("summary", '').replace(" ", "_")
                 if folder_name:
                     folder = os.path.join(folder_name, folder)
                 item_value['method'] = item_key
-                api = self.parse_each_item(item_value, base_path)
+                api = self.parse_each_item(item_value, definitions, base_path)
                 api["folder_name"] = folder
                 result.append(api)
         return result
@@ -127,7 +127,7 @@ class SwaggerParser(object):
         logging.info("Start to generate yaml testset.")
         swagger_data = self.read_swagger_data()
 
-        result = self.parse_items(swagger_data["paths"], swagger_data.get('info', {}).get('title'), swagger_data.get('basePath', '/'))
+        result = self.parse_items(swagger_data["paths"], swagger_data["definitions"], swagger_data.get('info', {}).get('title'), swagger_data.get('basePath', '/'))
         return result, swagger_data.get('info', {}).get('title')
 
     def save(self, data, output_dir, output_file_type="yml", name=''):
